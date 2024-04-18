@@ -1,58 +1,92 @@
-# 17-04-2024
+---
+title: 'Developing Data Products : R Markdown Presentation & Plotly'
+subtitle: 'Please use Right/Down Arrow or Space to advance to the next slide. This Presentation has 7 slides.'
+author: "Kamila"
+date: "April 18, 2024"
+output: ioslides_presentation
+---
 
-#Read car and truck values from tab-delimited autos.dat
-autos_data <- read.table("C:/R/autos.dat", header=T, sep="\t") 
+```{r setup, include=FALSE,message=FALSE,warning=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE,
+	tidy = TRUE,
+	tidy.opts = list(width.cutoff = 60)
+)
+```
 
-# Compute the largest y value used in the data (or we could
-# just use range again)
-max_y <- max(autos_data)
+## Synopsis {.smaller}
 
-# Define colors to be used for cars, trucks, suvs
-plot_colors <- c("blue","red","forestgreen")
+Following instructions have been given for the assignment -   
 
-# Start PNG device driver to save output to figure.png
-png(filename="C:/R/figure.png", height=295, width=300, 
-    bg="white")
+1. Create a web page presentation using R Markdown that features a plot created with Plotly.  
+2. Host your webpage on either RPubs, GitHub Pages, or NeoCities.   
+3. Your webpage must contain the date that you created the document, and it must contain a plot created with Plotly.
 
-# Graph autos using y axis that ranges from 0 to max_y.
-# Turn off axes and annotations (axis labels) so we can 
-# specify them ourself
-plot(autos_data$cars, type="o", col=plot_colors[1], 
-     ylim=c(0,max_y), axes=FALSE, ann=FALSE)
+The **Interactive Plots** presented in this Assignment are as follows -
 
-# Make x axis using Mon-Fri labels
-axis(1, at=1:5, lab=c("Mon", "Tue", "Wed", "Thu", "Fri"))
+1. A **Heatmap** depicting the Daily Ozone Levels in New York over a period of 5 months (May to September 1973).
+2. A **Time-Series chart** of the Population of the United States (in millions) for the period 1790-1970.
 
-# Make y axis with horizontal labels that display ticks at 
-# every 4 marks. 4*0:max_y is equivalent to c(0,4,8,12).
-axis(2, las=1, at=4*0:max_y)
+## Data Processing for Plot 1 : Heatmap R Code{.smaller}
 
-# Create box around plot
-box()
+```{r results='hide'}
+library(datasets);library(plotly);library(reshape2)
+data("airquality") ## Load the airquality dataset
 
-# Graph trucks with red dashed line and square points
-lines(autos_data$trucks, type="o", pch=22, lty=2, 
-      col=plot_colors[2])
+airquality$Month=as.factor(airquality$Month) ## Convert Month to factor
+ozone_daily=airquality[,c(1,5,6)] ## Extract Ozone, Month and Day columns
 
-# Graph suvs with green dotted line and diamond points
-lines(autos_data$suvs, type="o", pch=23, lty=3, 
-      col=plot_colors[3])
+## Convert Long format to Wide for input to Heatmap
+ozone_daily=dcast(ozone_daily,Day~Month,value.var = "Ozone") 
+ozone_daily=as.matrix(ozone_daily[,-1]) ## Convert to Matrix
+colnames(ozone_daily)=c("May","June","July","August","September")
 
-# Create a title with a red, bold/italic font
-title(main="Autos", col.main="red", font.main=4)
+## Plotly command
+plot_ly(z=ozone_daily,colorscale="Hot",x=colnames(ozone_daily),type="heatmap",colorbar = list(title = "Ozone Levels (parts per billion)"))%>%layout(title = "Daily Ozone Levels in New York, May to September 1973", xaxis = list(title = "Month"),yaxis = list(title = "Day"))
+```
 
-# Label the x and y axes with dark green text
-title(xlab= "Days", col.lab=rgb(0,0.5,0))
-title(ylab= "Total", col.lab=rgb(0,0.5,0))
+## Plotly - Interactive Plot 1: Heatmap
 
-# Create a legend at (1, max_y) that is slightly smaller 
-# (cex) and uses the same line colors and points used by 
-# the actual plots
-legend(1, max_y, names(autos_data), cex=0.8, col=plot_colors, 
-       pch=21:23, lty=1:3);
+```{r echo=FALSE}
+library(datasets);library(plotly);library(reshape2)
+data("airquality") ## Load the airquality dataset
 
-# Turn off device driver (to flush output to png)
-dev.off()
-Graph plotting data from autos.dat
+airquality$Month=as.factor(airquality$Month) ## Convert Month to factor
+ozone_daily=airquality[,c(1,5,6)] ## Extract Ozone, Month and Day columns
 
+## Convert Long format to Wide for input to Heatmap
+ozone_daily=dcast(ozone_daily,Day~Month,value.var = "Ozone") 
+ozone_daily=as.matrix(ozone_daily[,-1]) ## Convert to Matrix
+colnames(ozone_daily)=c("May","June","July","August","September")
 
+## Plotly command
+plot_ly(z=ozone_daily,colorscale="Hot",x=colnames(ozone_daily),type="heatmap",colorbar = list(title = "Ozone Levels (parts per billion)"))%>%layout(title = "Daily Ozone Levels in New York, May to September 1973", xaxis = list(title = "Month"),yaxis = list(title = "Day"))
+```
+
+## Plot 2 : Time-Series Chart R Code{.smaller}
+
+```{r results='hide'}
+library(datasets)
+library(plotly)
+data(uspop) ## Load the data set that gives the population of the United States 
+## (in millions) as recorded by the decennial census for the period 1790–1970.
+
+## Plotly Command
+plot_ly(x=~time(uspop),y=~uspop,type="scatter",mode="lines") %>% layout(title = "U.S. Population in millions for the period 1790-1970", xaxis = list(title = "Year"),yaxis = list(title = "U.S. Population (millions)"))
+```
+
+## Plotly - Interactive Plot 2: Time-Series Chart
+
+```{r echo=FALSE}
+library(datasets)
+library(plotly)
+data(uspop) ## Load the data set that gives the population of the United States in millions for the period 1790-1970
+
+## Plotly Command
+plot_ly(x=~time(uspop),y=~uspop,type="scatter",mode="lines") %>% layout(title = "U.S. Population in millions for the period 1790-1970", xaxis = list(title = "Year"),yaxis = list(title = "U.S. Population (millions)"))
+```
+
+## Thank You!
