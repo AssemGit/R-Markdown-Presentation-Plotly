@@ -1,8 +1,8 @@
 ---
 title: 'Developing Data Products : R Markdown Presentation & Plotly'
 subtitle: 'Please use Right/Down Arrow or Space to advance to the next slide. This Presentation has 7 slides.'
-author: "Kamila"
-date: "April 18, 2024"
+author: "Assem"
+date: "April 19, 2024"
 output: ioslides_presentation
 ---
 
